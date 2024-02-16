@@ -600,7 +600,7 @@ begin
   Pause := 0;
   SollHours := 0;
 
-  if qryExcelDAYCODE.OldValue <> qryExcelDAYCODE.Value then
+//  if qryExcelDAYCODE.OldValue <> qryExcelDAYCODE.Value then
   case qryExcelDAYCODE.AsInteger of
    1:  qryExcelDayType.AsString := rs_Feiertag +  qryExcelHOLIDAY.AsString;
    2:  qryExcelDayType.AsString := rs_FeiertagHalb +  qryExcelHOLIDAY.AsString;

@@ -115,7 +115,6 @@ object frmUser: TfrmUser
           Navigator.Buttons.GotoBookmark.Visible = True
           Navigator.Buttons.Filter.Visible = True
           ScrollbarAnnotations.CustomAnnotations = <>
-          OnCustomDrawCell = TVExcelCustomDrawCell
           DataController.DataSource = dmDatabase.dsExcel
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <>
@@ -174,7 +173,13 @@ object frmUser: TfrmUser
           end
           object TVExcelcalcDayType: TcxGridDBColumn
             DataBinding.FieldName = 'calcDayType'
+            PropertiesClassName = 'TcxTextEditProperties'
+            Properties.AutoSelect = False
+            Properties.HideSelection = False
+            Properties.ReadOnly = True
             OnCustomDrawCell = TVExcelcalcDayTypeCustomDrawCell
+            Options.Editing = False
+            Options.Focusing = False
           end
           object TVExcelHOLLYDAY: TcxGridDBColumn
             Caption = 'FEIERTAG'

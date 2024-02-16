@@ -4,7 +4,7 @@ object dmDatabase: TdmDatabase
   Width = 1181
   object FDConnection: TFDConnection
     Params.Strings = (
-      'Database=J:\!PROJECTS 2024\TIME\Trunk\BUILD\DB\THETIME.FDB'
+      'Database=J:\!PROJECTS 2024\TIME\TimeTrunk\BUILD\DB\THETIME.FDB'
       'User_Name=SYSDBA'
       'Server=Localhost'
       'CharacterSet=UTF8'
@@ -23,7 +23,6 @@ object dmDatabase: TdmDatabase
         SourceDataType = dtByteString
         TargetDataType = dtGUID
       end>
-    Connected = True
     Transaction = FDTransaction
     UpdateTransaction = trsUpd
     Left = 56

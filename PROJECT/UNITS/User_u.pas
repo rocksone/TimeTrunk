@@ -53,10 +53,6 @@ uses
   cxLabel, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, cxImageComboBox, cxImage;
 
-  type
-  TcxViewInfoAcess = class(TcxGridTableDataCellViewInfo);
-  TcxPainterAccess = class(TcxGridTableDataCellPainter);
-
 type
   TfrmUser = class(TForm)
     tcMonths: TcxTabControl;
@@ -100,12 +96,8 @@ type
     procedure tcMonthsChange(Sender: TObject);
     procedure TVExcelStylesGetContentStyle(Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord; AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
     procedure cxButton7Click(Sender: TObject);
-    procedure TVExcelcalcDayTypeCustomDrawCell(Sender: TcxCustomGridTableView;
-        ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone:
-        Boolean);
+    procedure TVExcelcalcDayTypeCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
     procedure TVExcelCODEPropertiesEditValueChanged(Sender: TObject);
-    procedure TVExcelCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas:
-        TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
   private
     FUserID, FYear: Integer;
 
@@ -122,9 +114,14 @@ var
 implementation
 
 uses
-  dmDatabase_u, dmStyle_u, xGlobalVars_u,dxGDIPlusClasses;
+  dmDatabase_u, dmStyle_u, xGlobalVars_u, dxGDIPlusClasses;
 
 {$R *.dfm}
+
+type
+  TcxViewInfoAcess = class(TcxGridTableDataCellViewInfo);
+  TcxPainterAccess = class(TcxGridTableDataCellPainter);
+  TcxImageComboBoxPropertiesAccess = class(TcxImageComboBoxProperties);
 
 procedure TfrmUser.FormCreate(Sender: TObject);
 begin
@@ -224,29 +221,56 @@ begin
   dmDatabase.qryexcel.Refresh;
 end;
 
-procedure TfrmUser.TVExcelcalcDayTypeCustomDrawCell(Sender:
-    TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo:
-    TcxGridTableDataCellViewInfo; var ADone: Boolean);
-    var
-      APainter: TcxPainterAccess;
+procedure TfrmUser.TVExcelcalcDayTypeCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo;
+  var ADone: Boolean);
+
+  function VarToIntDef(const V: Variant; const ADefault: Integer = 0): Integer;
 begin
+  if V = NULL then
+    Result := ADefault
+  else
+    Result := V;
+end;
 
 
-     with TcxCustomTextEditViewInfo(AViewInfo.EditViewInfo).TextRect do
-        Left := Left + dmStyle.imlCodes.Width + 1;
+var
+  APainter: TcxPainterAccess;
+  AItem: TcxImageComboBoxItem;
+  v: Variant;
+  i:integer;
+begin
+  if (AViewInfo.Item <> TVExcelcalcDayType) or not(AViewInfo.EditViewInfo is TcxCustomTextEditViewInfo) then
+    Exit;
+  APainter := TcxPainterAccess(TcxViewInfoAcess(AViewInfo).GetPainterClass.Create(ACanvas, AViewInfo));
+  with APainter do
+  begin
+    try
+      with TcxCustomTextEditViewInfo(AViewInfo.EditViewInfo).TextRect do
+      begin
+        Left := Left + dmStyle.imlCodes.Width + 5;
+      DrawContent;
+      DrawBorders;
+      end;
 
-///    DrawContent;
-  //   if <your condition> then
-       ACanvas.FillRect(AViewInfo.Bounds, cldefault);  // red cell's background
+      // drawing images in cells
+      // with AViewInfo.ClientBounds do
+      // ACanvas.DrawGlyph(Left + 1, Top + 1, cxImage1.Picture.Bitmap);
 
-  //   if <your condition> then
-       ACanvas.Font.Color := clYellow;             // yellow text color
-     ACanvas.DrawTexT(AViewInfo.Text, TcxCustomTextEditViewInfo(AViewInfo.EditViewInfo).TextRect, cxAlignLeft or cxAlignVCenter);
+      v := TVExcel.DataController.Values[AViewInfo.GridRecord.RecordIndex, TVExcelDAYCODE.index];
 
-  //   DrawBorders;
+      if (VarToIntDef(v) in [1, 2, 3, 4, 16]) then
+      begin
+        AItem := TcxImageComboBoxPropertiesAccess(dmStyle.icbDayCode.Properties).FindItemByValue(v);
         with AViewInfo.ClientBounds do
-        dmStyle.imlCodes.Draw(ACanvas.Canvas, Left + 1, Top + 1, 2);
-          ADone := True;
+          dmStyle.imlCodes.Draw(ACanvas.Canvas, Left + 4, Top + 3, AItem.ImageIndex);
+      end;
+    finally
+      Free;
+
+    end;
+
+  end;
+  ADone := True;
 end;
 
 procedure TfrmUser.TVExcelCODEPropertiesEditValueChanged(Sender: TObject);
@@ -274,7 +298,7 @@ begin
   with TVExcel.DataController do
   begin
 
-    i := Values[FocusedRecordIndex, TVExcelCODE.Index];
+    i := Values[FocusedRecordIndex, TVExcelCODE.index];
     if i = NULL then
     begin
       getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID)
@@ -286,18 +310,18 @@ begin
 
         11, 13:
           begin // Urlaubsantrag ½ Tag | Urlaub ½ Tag
-            if {(dmDatabase.qryExcelFCOST.AsFloat > 0) and} ((dmDatabase.qryExcelUHOURS.AsInteger > 0)) then
-              dmDatabase.qryExcelFCOST.AsCurrency :=  dmDatabase.qryExcelFCOST.AsCurrency + 0.5
-              //dmDatabase.qryExcelUHOURS.AsInteger -
-              //  Trunc(dmDatabase.qryExcelUHOURS.AsInteger * dmDatabase.qryExcelFCOST.AsFloat) * 2;
-            // else
-            // dmDatabase.qryExcelUHOURS.AsInteger := dmDatabase.qryExcelUHOURS.AsInteger - Trunc(dmDatabase.qryExcelUHOURS.AsInteger * dmDatabase.qryExcelFCOST.AsFloat)*2
+            if { (dmDatabase.qryExcelFCOST.AsFloat > 0) and } ((dmDatabase.qryExcelUHOURS.AsInteger > 0)) then
+              dmDatabase.qryExcelFCOST.AsCurrency := dmDatabase.qryExcelFCOST.AsCurrency + 0.5
+              // dmDatabase.qryExcelUHOURS.AsInteger -
+              // Trunc(dmDatabase.qryExcelUHOURS.AsInteger * dmDatabase.qryExcelFCOST.AsFloat) * 2;
+              // else
+              // dmDatabase.qryExcelUHOURS.AsInteger := dmDatabase.qryExcelUHOURS.AsInteger - Trunc(dmDatabase.qryExcelUHOURS.AsInteger * dmDatabase.qryExcelFCOST.AsFloat)*2
           end;
         7, 9:
-          begin   //Krank Restzeit Kurzarbeit Restzeit
+          begin // Krank Restzeit Kurzarbeit Restzeit
 
-           if  dmDatabase.qryExcelcalcIsTime.AsInteger > 0 then
-            dmDatabase.qryExcelUHOURS.AsInteger := dmDatabase.qryExcelcalcIsTime.AsInteger;
+            if dmDatabase.qryExcelcalcIsTime.AsInteger > 0 then
+              dmDatabase.qryExcelUHOURS.AsInteger := dmDatabase.qryExcelcalcIsTime.AsInteger;
           end;
 
         // dmDatabase.qryExcelNOTE.AsString :='sda';
@@ -305,151 +329,108 @@ begin
   end;
 end;
 
-procedure TfrmUser.TVExcelCustomDrawCell(Sender: TcxCustomGridTableView;
-    ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone:
-    Boolean);
-
-    //var
-//  AImage: TdxSmartImage;
-//    APainter: TcxPainterAccess;
-    begin
-//
-//     if (AViewInfo.Item <> TVExcelcalcDayType) or
-//    not (AViewInfo.EditViewInfo is TcxCustomTextEditViewInfo) then
-//      Exit;
-//  APainter := TcxPainterAccess(TcxViewInfoAcess(AViewInfo).GetPainterClass.Create(ACanvas, AViewInfo));
-//  with APainter do
-//  begin
-//
-//      with TcxCustomTextEditViewInfo(AViewInfo.EditViewInfo).TextRect do
-//        Left := Left + dmStyle.imlCodes.Width + 1;
-//      DrawContent;
-//      DrawBorders;
-//
-//       AImage := TdxSmartImage.Create;
-//  try
-// dmStyle.imlCodes.GetImage(0, AImage);
-//  cxImage1.Picture.Assign(AImage);
-//
-//   with AViewInfo.ClientBounds do
-//        ACanvas.DrawGlyph(Left + 1, Top + 1, cxImage1.Picture.Bitmap);
-//
-//
-//  finally
-//    AImage.Free;
-//  end;
-//
-//
-//
-//
-//
-//
-//    end;
-end;
-
-
-  procedure TfrmUser.TVExcelStylesGetContentStyle(Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord; AItem: TcxCustomGridTableItem;
-    var AStyle: TcxStyle);
-  var
-    i: Integer;
+procedure TfrmUser.TVExcelStylesGetContentStyle(Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord; AItem: TcxCustomGridTableItem;
+  var AStyle: TcxStyle);
+var
+  i: Integer;
+begin
+  // TAG: ARBEITS TAG; FEIERTAG,
+  if ((AItem.index = TVExcelCOMES1.index) or (AItem.index = TVExcelGOES1.index) or (AItem.index = TVExcelCOMES2.index) or (AItem.index = TVExcelGOES2.index) or
+    (AItem.index = TVExcelPAUSE.index) or (AItem.index = TVExcelCODE.index)) and (not VarIsNull(ARecord.Values[TVExcelDAYCODE.index])) then
   begin
-    // TAG: ARBEITS TAG; FEIERTAG,
-    if ((AItem.Index = TVExcelCOMES1.Index) or (AItem.Index = TVExcelGOES1.Index) or (AItem.Index = TVExcelCOMES2.Index) or (AItem.Index = TVExcelGOES2.Index)
-      or (AItem.Index = TVExcelPAUSE.Index) or (AItem.Index = TVExcelCODE.Index)) and (not VarIsNull(ARecord.Values[TVExcelDAYCODE.Index])) then
-    begin
-      i := (ARecord.Values[TVExcelDAYCODE.Index]);
-      case i of
-        cArbeitstag:
-          AStyle := dmStyle.cxWorkDay;
-        cFreierTag:
-          AStyle := dmStyle.cxFreeDay;
-        cKurzarbeit:
-          AStyle := dmStyle.cxKurzArbeit;
-        cKurzarbeitRest:
-          AStyle := dmStyle.cxKurzArbeitRest;
-      end;
-    end
-    else if not VarIsNull(ARecord.Values[TVExcelDAYCODE.Index]) then
-    begin
-      i := (ARecord.Values[TVExcelDAYCODE.Index]);
-      case i of
-
-        cFeiertag:
-          AStyle := dmStyle.cxFreeDay;
-      end;
+    i := (ARecord.Values[TVExcelDAYCODE.index]);
+    case i of
+      cArbeitstag:
+        AStyle := dmStyle.cxWorkDay;
+      cFreierTag:
+        AStyle := dmStyle.cxFreeDay;
+      cKurzarbeit:
+        AStyle := dmStyle.cxKurzArbeit;
+      cKurzarbeitRest:
+        AStyle := dmStyle.cxKurzArbeitRest;
     end;
+  end
+  else if not VarIsNull(ARecord.Values[TVExcelDAYCODE.index]) then
+  begin
+    i := (ARecord.Values[TVExcelDAYCODE.index]);
+    case i of
 
-    if ((AItem.Index = TVExcelCOMES1.Index) or (AItem.Index = TVExcelGOES1.Index) or (AItem.Index = TVExcelCOMES2.Index) or (AItem.Index = TVExcelGOES2.Index)
-      or (AItem.Index = TVExcelPAUSE.Index) or (AItem.Index = TVExcelCODE.Index)) and (not VarIsNull(ARecord.Values[TVExcelCODE.Index])) then
-    begin
-      i := (ARecord.Values[TVExcelCODE.Index]);
-      case i of
-        cGleittag:
-          AStyle := dmStyle.cxGleitTag;
-        cKurzarbeit:
-          AStyle := dmStyle.cxKurzArbeit;
-        cKurzarbeitRest:
-          AStyle := dmStyle.cxKurzArbeitRest;
-        cUrlaubsantrag:
-          AStyle := dmStyle.cxUrlaubAntrag;
-        cUrlaubsantragHalb:
-          AStyle := dmStyle.cxUrlaubAntragHalb;
-        cHomeoffice:
-          AStyle := dmStyle.cxHomeOffice;
-
-      end;
+      cFeiertag:
+        AStyle := dmStyle.cxFreeDay;
     end;
-
-    if (AItem.Index = TVExcelcalcHourDiff.Index) then
-    begin
-      if (ARecord.Values[TVExcelcalcHourDiff.Index]) > 0 then
-
-        AStyle := dmStyle.cxPlus
-      else if (ARecord.Values[TVExcelcalcHourDiff.Index]) < 0 then
-        AStyle := dmStyle.cxminus
-    end;
-
-    // WOCHEN ENDE SA/SO
-    if not VarIsNull(ARecord.Values[TVExcelUDAY.Index]) then
-    begin
-      i := DayOfWeek(ARecord.Values[TVExcelUDAY.Index]);
-      case i of
-        1:
-          AStyle := dmStyle.cxSonday;
-        7:
-          AStyle := dmStyle.cxSaturday;
-
-      end;
-    end;
-
-    if not VarIsNull(ARecord.Values[TVExcelDAYCODE.Index]) then
-    begin
-      i := (ARecord.Values[TVExcelDAYCODE.Index]);
-      case i of
-        cFeiertag:
-          AStyle := dmStyle.cxHoliday;
-        cFeiertagHalb:
-          AStyle := dmStyle.cxHoliExtra;
-        cBenutzerLater:
-          AStyle := dmStyle.cxNoActive;
-      end;
-    end;
-
-    if not VarIsNull(ARecord.Values[TVExcelCODE.Index]) then
-    begin
-      i := (ARecord.Values[TVExcelCODE.Index]);
-      case i of
-        cKrank:
-          AStyle := dmStyle.cxKrank;
-        cKrankRest:
-          AStyle := dmStyle.cxKrankRest;
-        cUrlaub:
-          AStyle := dmStyle.cxUrlaub;
-        cUrlaubHalb:
-          AStyle := dmStyle.cxUrlaubHalb;
-      end;
-    end;
-
   end;
+
+  if ((AItem.index = TVExcelCOMES1.index) or (AItem.index = TVExcelGOES1.index) or (AItem.index = TVExcelCOMES2.index) or (AItem.index = TVExcelGOES2.index) or
+    (AItem.index = TVExcelPAUSE.index) or (AItem.index = TVExcelCODE.index)) and (not VarIsNull(ARecord.Values[TVExcelCODE.index])) then
+  begin
+    i := (ARecord.Values[TVExcelCODE.index]);
+    case i of
+      cGleittag:
+        AStyle := dmStyle.cxGleitTag;
+      cKurzarbeit:
+        AStyle := dmStyle.cxKurzArbeit;
+      cKurzarbeitRest:
+        AStyle := dmStyle.cxKurzArbeitRest;
+      cUrlaubsantrag:
+        AStyle := dmStyle.cxUrlaubAntrag;
+      cUrlaubsantragHalb:
+        AStyle := dmStyle.cxUrlaubAntragHalb;
+      cHomeoffice:
+        AStyle := dmStyle.cxHomeOffice;
+
+    end;
+  end;
+
+  if (AItem.index = TVExcelcalcHourDiff.index) then
+  begin
+    if (ARecord.Values[TVExcelcalcHourDiff.index]) > 0 then
+
+      AStyle := dmStyle.cxPlus
+    else if (ARecord.Values[TVExcelcalcHourDiff.index]) < 0 then
+      AStyle := dmStyle.cxminus
+  end;
+
+  // WOCHEN ENDE SA/SO
+  if not VarIsNull(ARecord.Values[TVExcelUDAY.index]) then
+  begin
+    i := DayOfWeek(ARecord.Values[TVExcelUDAY.index]);
+    case i of
+      1:
+        AStyle := dmStyle.cxSonday;
+      7:
+        AStyle := dmStyle.cxSaturday;
+
+    end;
+  end;
+
+  if not VarIsNull(ARecord.Values[TVExcelDAYCODE.index]) then
+  begin
+    i := (ARecord.Values[TVExcelDAYCODE.index]);
+    case i of
+      cFeiertag:
+        AStyle := dmStyle.cxHoliday;
+      cFeiertagHalb:
+        AStyle := dmStyle.cxHoliExtra;
+      cBenutzerLater:
+        AStyle := dmStyle.cxNoActive;
+    end;
+  end;
+
+  if not VarIsNull(ARecord.Values[TVExcelCODE.index]) then
+  begin
+    i := (ARecord.Values[TVExcelCODE.index]);
+    case i of
+      cKrank:
+        AStyle := dmStyle.cxKrank;
+      cKrankRest:
+        AStyle := dmStyle.cxKrankRest;
+      cUrlaub:
+        AStyle := dmStyle.cxUrlaub;
+      cUrlaubHalb:
+        AStyle := dmStyle.cxUrlaubHalb;
+    end;
+  end;
+
+end;
 
 end.
