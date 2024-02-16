@@ -135,6 +135,7 @@ object frmUser: TfrmUser
           OptionsView.HeaderAutoHeight = True
           OptionsView.HeaderHeight = 45
           Styles.OnGetContentStyle = TVExcelStylesGetContentStyle
+          Styles.Inactive = dmStyle.gdInavtive
           object TVExcelUSERYEARDAT_ID: TcxGridDBColumn
             DataBinding.FieldName = 'USERYEARDAT_ID'
             Visible = False
@@ -168,6 +169,9 @@ object frmUser: TfrmUser
           end
           object TVExcelDAYCODE: TcxGridDBColumn
             DataBinding.FieldName = 'DAYCODE'
+            PropertiesClassName = 'TcxImageComboBoxProperties'
+            Properties.Items = <>
+            Properties.OnEditValueChanged = TVExcelDAYCODEEdit
             RepositoryItem = dmStyle.icbDayCode
             MinWidth = 105
           end
@@ -233,7 +237,7 @@ object frmUser: TfrmUser
             PropertiesClassName = 'TcxImageComboBoxProperties'
             Properties.ImmediatePost = True
             Properties.Items = <>
-            Properties.OnEditValueChanged = TVExcelCODEPropertiesEditValueChanged
+            Properties.OnEditValueChanged = TVExcelCODEEdit
             RepositoryItem = dmStyle.icbCodes
             MinWidth = 100
             Styles.Header = dmStyle.cxPlus

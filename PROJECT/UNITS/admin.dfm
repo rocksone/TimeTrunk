@@ -21,7 +21,7 @@ object frmAdmin: TfrmAdmin
     Height = 623
     Align = alClient
     TabOrder = 3
-    Properties.ActivePage = tsExcel
+    Properties.ActivePage = tsCreateUserYear
     Properties.CustomButtons.Buttons = <>
     Properties.Images = dmStyle.imlControl
     Properties.TabHeight = 35
@@ -36,6 +36,8 @@ object frmAdmin: TfrmAdmin
       Caption = 'Benutzer Zeiten'
       ImageIndex = 21
       OnShow = tsExcelShow
+      ExplicitWidth = 1105
+      ExplicitHeight = 577
       object pnlLeftExcel: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -45,6 +47,7 @@ object frmAdmin: TfrmAdmin
         Margins.Right = 0
         Align = alLeft
         TabOrder = 1
+        ExplicitHeight = 571
         object dxPanel11: TdxPanel
           Left = 0
           Top = 0
@@ -96,6 +99,7 @@ object frmAdmin: TfrmAdmin
           Margins.Top = 0
           Align = alClient
           TabOrder = 1
+          ExplicitHeight = 535
           object TVUserExcelList: TcxGridDBTableView
             Navigator.Buttons.CustomButtons = <>
             Navigator.Buttons.First.Visible = True
@@ -181,6 +185,7 @@ object frmAdmin: TfrmAdmin
         Margins.Bottom = 0
         HotZoneClassName = 'TcxXPTaskBarStyle'
         Control = pnlLeftExcel
+        ExplicitHeight = 577
       end
     end
     object tsCreateUserYear: TcxTabSheet
@@ -498,10 +503,6 @@ object frmAdmin: TfrmAdmin
     object tsUser: TcxTabSheet
       Caption = 'Benutzer Liste'
       ImageIndex = 14
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pnlUser: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -825,7 +826,7 @@ object frmAdmin: TfrmAdmin
         Height = 572
         Margins.Right = 0
         Align = alLeft
-        TabOrder = 0
+        TabOrder = 1
         object dxPanel7: TdxPanel
           Left = 0
           Top = 0
@@ -880,7 +881,6 @@ object frmAdmin: TfrmAdmin
               end>
             Properties.ListSource = dmDatabase.dsCountry
             TabOrder = 0
-            ExplicitHeight = 21
             Width = 54
           end
         end
@@ -1092,8 +1092,6 @@ object frmAdmin: TfrmAdmin
     object tsHollydays: TcxTabSheet
       Caption = 'Feiertage'
       ImageIndex = 28
-      ExplicitWidth = 1105
-      ExplicitHeight = 577
       object pnlLeft: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -1103,7 +1101,6 @@ object frmAdmin: TfrmAdmin
         Margins.Right = 0
         Align = alLeft
         TabOrder = 1
-        ExplicitHeight = 571
         object pnlLeftTop: TdxPanel
           Left = 0
           Top = 0
@@ -1155,7 +1152,6 @@ object frmAdmin: TfrmAdmin
           Margins.Top = 0
           Align = alClient
           TabOrder = 1
-          ExplicitHeight = 535
           object TVStatesF: TcxGridDBTableView
             Navigator.Buttons.CustomButtons = <>
             Navigator.Buttons.First.Visible = True
@@ -1229,7 +1225,6 @@ object frmAdmin: TfrmAdmin
         Width = 8
         Height = 578
         Control = pnlLeft
-        ExplicitHeight = 577
       end
       object dxPanel18: TdxPanel
         AlignWithMargins = True
@@ -1240,8 +1235,6 @@ object frmAdmin: TfrmAdmin
         Margins.Left = 0
         Align = alClient
         TabOrder = 2
-        ExplicitWidth = 853
-        ExplicitHeight = 571
         object dxPanel19: TdxPanel
           AlignWithMargins = True
           Left = 3
@@ -1251,7 +1244,6 @@ object frmAdmin: TfrmAdmin
           Margins.Bottom = 0
           Align = alTop
           TabOrder = 0
-          ExplicitWidth = 845
         end
         object GDHoliStatesF: TcxGrid
           AlignWithMargins = True
@@ -1261,8 +1253,6 @@ object frmAdmin: TfrmAdmin
           Height = 530
           Align = alClient
           TabOrder = 1
-          ExplicitWidth = 845
-          ExplicitHeight = 529
           object TVHoliStatesF: TcxGridDBTableView
             Navigator.Buttons.CustomButtons = <>
             Navigator.Buttons.First.Visible = True
@@ -1576,18 +1566,10 @@ object frmAdmin: TfrmAdmin
     object tsReport: TcxTabSheet
       Caption = 'tsReport'
       ImageIndex = 37
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object tsConfig: TcxTabSheet
       Caption = 'Konfiguration'
       ImageIndex = 18
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object cxTabSheet1: TcxTabSheet
       Caption = 'TODO'

@@ -551,10 +551,10 @@ end;
 procedure TdmDatabase.qryExcelCalcFields(DataSet: TDataSet);
 resourcestring
   rs_Feiertag       = 'Feiertag: ';
-  rs_FeiertagHalb   = 'Feiertag  ½ Tag: ';
+  rs_FeiertagHalb   = 'Feiertag  ½ Tag';
   rs_Arbeitstag     = 'Arbeitstag';
   rs_FreierTag	    = 'Freier Tag';
-  rs_Wochenende	    = 'Wochenend';
+  rs_Wochenende	    = 'Wochenende';
   rs_Inaktiv        = 'Inaktiver Benutzer';
 
 function VarToIntDef(const V: Variant; const ADefault: Integer = 0): Integer;
@@ -600,13 +600,15 @@ begin
   Pause := 0;
   SollHours := 0;
 
-//  if qryExcelDAYCODE.OldValue <> qryExcelDAYCODE.Value then
+ // if qryExcelDAYCODE.OldValue <> qryExcelDAYCODE.Value then
   case qryExcelDAYCODE.AsInteger of
    1:  qryExcelDayType.AsString := rs_Feiertag +  qryExcelHOLIDAY.AsString;
    2:  qryExcelDayType.AsString := rs_FeiertagHalb +  qryExcelHOLIDAY.AsString;
    3:  qryExcelDayType.AsString := rs_Arbeitstag;
    4:  qryExcelDayType.AsString := rs_FreierTag;
    16: qryExcelDayType.AsString := rs_Inaktiv;
+   17: qryExcelDayType.AsString := rs_Wochenende;
+   18: qryExcelDayType.AsString := rs_Wochenende;
   end;
 
   //

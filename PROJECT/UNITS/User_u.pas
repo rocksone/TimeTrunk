@@ -97,7 +97,8 @@ type
     procedure TVExcelStylesGetContentStyle(Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord; AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
     procedure cxButton7Click(Sender: TObject);
     procedure TVExcelcalcDayTypeCustomDrawCell(Sender: TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
-    procedure TVExcelCODEPropertiesEditValueChanged(Sender: TObject);
+    procedure TVExcelCODEEdit(Sender: TObject);
+    procedure TVExcelDAYCODEEdit(Sender: TObject);
   private
     FUserID, FYear: Integer;
 
@@ -251,14 +252,8 @@ begin
       DrawContent;
       DrawBorders;
       end;
-
-      // drawing images in cells
-      // with AViewInfo.ClientBounds do
-      // ACanvas.DrawGlyph(Left + 1, Top + 1, cxImage1.Picture.Bitmap);
-
       v := TVExcel.DataController.Values[AViewInfo.GridRecord.RecordIndex, TVExcelDAYCODE.index];
-
-      if (VarToIntDef(v) in [1, 2, 3, 4, 16]) then
+      if (VarToIntDef(v) in [1, 2, 3, 4, 16, 17,18]) then
       begin
         AItem := TcxImageComboBoxPropertiesAccess(dmStyle.icbDayCode.Properties).FindItemByValue(v);
         with AViewInfo.ClientBounds do
@@ -266,14 +261,49 @@ begin
       end;
     finally
       Free;
-
     end;
-
   end;
   ADone := True;
 end;
 
-procedure TfrmUser.TVExcelCODEPropertiesEditValueChanged(Sender: TObject);
+procedure TfrmUser.TVExcelDAYCODEEdit(Sender: TObject);
+  procedure getHoursForAday(aDate: TDate; aUserYear_ID: Integer);
+  begin
+//    if (dmDatabase.qryExcelDAYCODE.AsInteger in [1, 4]) then
+//      dmDatabase.qryExcelUHOURS.Clear
+//    else
+    begin
+      FDgetDay.Prepare;
+      FDgetDay.Params[0].AsDate := aDate;
+      FDgetDay.Params[1].AsInteger := aUserYear_ID;
+      FDgetDay.OpenOrExecute;
+      dmDatabase.qryExcelUHOURS.AsInteger := FDgetDay.Fields[0].AsInteger;
+      dmDatabase.qryExcelFCOST.AsFloat := FDgetDay.Fields[1].AsFloat;
+      FDgetDay.Close;
+    end;
+  end;
+var
+  AImageComboBox: TcxImageComboBox;
+  i: variant;
+begin
+  AImageComboBox := TcxImageComboBox(Sender);
+  with TVExcel.DataController do
+  begin
+    i := Values[FocusedRecordIndex, TVExcelDAYCODE.index];
+//    if i = NULL then
+//    begin
+//      getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID)
+//    end
+//    else
+      case i of
+        1,4,16,17,18:  //1 Feiertag; 4 Freier Tag; 16 Inaktiver Benutzer; 17 Wochende
+          dmDatabase.qryExcelUHOURS.Clear;
+        2,3:  getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID);
+      end;
+  end;
+end;
+
+procedure TfrmUser.TVExcelCODEEdit(Sender: TObject);
   procedure getHoursForAday(aDate: TDate; aUserYear_ID: Integer);
   begin
     if (dmDatabase.qryExcelDAYCODE.AsInteger in [1, 4]) then
@@ -299,7 +329,7 @@ begin
   begin
 
     i := Values[FocusedRecordIndex, TVExcelCODE.index];
-    if i = NULL then
+    if (i = NULL) or (i=0) then
     begin
       getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID)
     end
@@ -328,6 +358,10 @@ begin
       end;
   end;
 end;
+
+
+
+
 
 procedure TfrmUser.TVExcelStylesGetContentStyle(Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord; AItem: TcxCustomGridTableItem;
   var AStyle: TcxStyle);

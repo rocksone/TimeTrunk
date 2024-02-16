@@ -1050,6 +1050,7 @@ object dmDatabase: TdmDatabase
       Origin = 'DAYCODE'
     end
     object qryExcelDayType: TStringField
+      DisplayWidth = 40
       FieldKind = fkCalculated
       FieldName = 'calcDayType'
       Size = 40
