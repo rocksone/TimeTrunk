@@ -15,7 +15,8 @@ uses
   xGlobalVars_u in 'UNITS\xGlobalVars_u.pas',
   User_u in 'UNITS\User_u.pas' {frmUser},
   fmSplashScreen_u in 'UNITS\fmSplashScreen_u.pas' {fmSplashScreen},
-  frmUebertrag_u in 'UNITS\frmUebertrag_u.pas' {frmUebertrag};
+  frmUebertrag_u in 'UNITS\frmUebertrag_u.pas' {frmUebertrag},
+  xrsMath_u in 'COM\xrsMath_u.pas';
 
 {$R *.res}
 

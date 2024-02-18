@@ -115,7 +115,7 @@ var
 implementation
 
 uses
-  dmDatabase_u, dmStyle_u, xGlobalVars_u, dxGDIPlusClasses;
+  dmDatabase_u, dmStyle_u, xGlobalVars_u, dxGDIPlusClasses, xrsMath_u;
 
 {$R *.dfm}
 
@@ -253,7 +253,7 @@ begin
       DrawBorders;
       end;
       v := TVExcel.DataController.Values[AViewInfo.GridRecord.RecordIndex, TVExcelDAYCODE.index];
-      if (VarToIntDef(v) in [1, 2, 3, 4, 16, 17,18]) then
+      if (VarToIntDef(v) in [cFeiertag, cFeiertagHalb, cArbeitstag, cFreierTag, cBenutzerLater, cSamstag,cSonntag]) then
       begin
         AItem := TcxImageComboBoxPropertiesAccess(dmStyle.icbDayCode.Properties).FindItemByValue(v);
         with AViewInfo.ClientBounds do
@@ -296,9 +296,9 @@ begin
 //    end
 //    else
       case i of
-        1,4,16,17,18:  //1 Feiertag; 4 Freier Tag; 16 Inaktiver Benutzer; 17 Wochende
+        cFeiertag,cFreierTag,cBenutzerLater,cSamstag,cSonntag:  //1 Feiertag; 4 Freier Tag; 16 Inaktiver Benutzer; 17 Wochende
           dmDatabase.qryExcelUHOURS.Clear;
-        2,3:  getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID);
+        cFeiertagHalb,cArbeitstag:  getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID);
       end;
   end;
 end;
@@ -331,23 +331,28 @@ begin
     i := Values[FocusedRecordIndex, TVExcelCODE.index];
     if (i = NULL) or (i=0) then
     begin
-      getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID)
+      getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID);
+       dmDatabase.qryExcelCODE.AsInteger := 0;
     end
     else
+    begin
+//     i := dmDatabase.qryExcelCODE.NewValue;
+  if (VarToIntDef(dmDatabase.qryExcelCODE.NewValue) in [cKrank,cKrankRest,cKurzarbeit,cKurzarbeitRest,cUrlaubsantrag,cUrlaubsantragHalb,cUrlaub, cUrlaubHalb]) then  //cBereitschaft kläreung
+    getHoursForAday(dmDatabase.qryExcelUDAY.AsDateTime, APP.USERYEAR_ID);
       case i of
-        6, 8, 10, 12:
+        cKrank, cKurzarbeit, cUrlaubsantrag, cUrlaub:
           dmDatabase.qryExcelUHOURS.Clear; // Krank  | Kurzarbeit |  Urlaubsantrag Tag | Urlaub
 
-        11, 13:
+        cUrlaubsantragHalb, cUrlaubHalb:
           begin // Urlaubsantrag ½ Tag | Urlaub ½ Tag
-            if { (dmDatabase.qryExcelFCOST.AsFloat > 0) and } ((dmDatabase.qryExcelUHOURS.AsInteger > 0)) then
+            if  ((dmDatabase.qryExcelUHOURS.AsInteger > 0)) then
               dmDatabase.qryExcelFCOST.AsCurrency := dmDatabase.qryExcelFCOST.AsCurrency + 0.5
-              // dmDatabase.qryExcelUHOURS.AsInteger -
-              // Trunc(dmDatabase.qryExcelUHOURS.AsInteger * dmDatabase.qryExcelFCOST.AsFloat) * 2;
-              // else
-              // dmDatabase.qryExcelUHOURS.AsInteger := dmDatabase.qryExcelUHOURS.AsInteger - Trunc(dmDatabase.qryExcelUHOURS.AsInteger * dmDatabase.qryExcelFCOST.AsFloat)*2
+
+
+
+
           end;
-        7, 9:
+        cKrankRest, cKurzarbeitRest:
           begin // Krank Restzeit Kurzarbeit Restzeit
 
             if dmDatabase.qryExcelcalcIsTime.AsInteger > 0 then
@@ -356,6 +361,8 @@ begin
 
         // dmDatabase.qryExcelNOTE.AsString :='sda';
       end;
+  end;
+
   end;
 end;
 

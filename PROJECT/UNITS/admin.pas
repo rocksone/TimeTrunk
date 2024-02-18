@@ -495,7 +495,7 @@ begin
     dmDatabase.FDSADDHolidaysDat.Params[1].AsDate := dmDatabase.qryHolidaysDatListHDATE.AsDateTime;
     dmDatabase.FDSADDHolidaysDat.Params[2].AsString := dmDatabase.qryHolidaysDatListHNAME.AsString;
     dmDatabase.FDSADDHolidaysDat.Params[3].Value := dmDatabase.qryHolidaysDatListFCOST.Value;
-    dmDatabase.FDSADDHolidaysDat.Params[4].AsInteger := 1;
+    dmDatabase.FDSADDHolidaysDat.Params[4].AsInteger := cFeiertag;
     dmDatabase.FDSADDHolidaysDat.ExecProc;
     dmDatabase.FDSADDHolidaysDat.Close;
     dmDatabase.qryHolidaysDatList.Next;
@@ -514,7 +514,7 @@ begin
     dmDatabase.FDSADDHolidaysDat.Params[1].AsDate := RecodeYear(dmDatabase.qryHolidaysExtraListHDATE.AsDateTime, Year);
     dmDatabase.FDSADDHolidaysDat.Params[2].AsString := dmDatabase.qryHolidaysExtraListHNAME.AsString;
     dmDatabase.FDSADDHolidaysDat.Params[3].Value := dmDatabase.qryHolidaysExtraListFCOST.Value;
-    dmDatabase.FDSADDHolidaysDat.Params[4].AsInteger := 2;
+    dmDatabase.FDSADDHolidaysDat.Params[4].AsInteger := cFeiertagHalb;
     dmDatabase.FDSADDHolidaysDat.ExecProc;
     dmDatabase.FDSADDHolidaysDat.Close;
     dmDatabase.qryHolidaysExtraList.Next;
@@ -524,9 +524,7 @@ end;
 procedure TfrmAdmin.CreateExcel;
 var
   ts: TcxTabSheet;
-
 begin
-
   if tsExcel.ControlCount = 2 then
   begin
     ts := tsExcel;

@@ -36,6 +36,8 @@ object frmAdmin: TfrmAdmin
       Caption = 'Benutzer Zeiten'
       ImageIndex = 21
       OnShow = tsExcelShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 1105
       ExplicitHeight = 577
       object pnlLeftExcel: TdxPanel
@@ -192,6 +194,10 @@ object frmAdmin: TfrmAdmin
       Caption = 'Jahreszeiten erzeugen'
       ImageIndex = 11
       OnShow = tsCreateUserYearShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlTVUserList: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -503,6 +509,10 @@ object frmAdmin: TfrmAdmin
     object tsUser: TcxTabSheet
       Caption = 'Benutzer Liste'
       ImageIndex = 14
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlUser: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -818,6 +828,10 @@ object frmAdmin: TfrmAdmin
       Caption = 'Arbeitzeit'
       ImageIndex = 39
       OnShow = tsArbeitzeitShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object dxPanel6: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -826,7 +840,7 @@ object frmAdmin: TfrmAdmin
         Height = 572
         Margins.Right = 0
         Align = alLeft
-        TabOrder = 1
+        TabOrder = 0
         object dxPanel7: TdxPanel
           Left = 0
           Top = 0
@@ -881,6 +895,7 @@ object frmAdmin: TfrmAdmin
               end>
             Properties.ListSource = dmDatabase.dsCountry
             TabOrder = 0
+            ExplicitHeight = 21
             Width = 54
           end
         end
@@ -1092,6 +1107,10 @@ object frmAdmin: TfrmAdmin
     object tsHollydays: TcxTabSheet
       Caption = 'Feiertage'
       ImageIndex = 28
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlLeft: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -1340,6 +1359,10 @@ object frmAdmin: TfrmAdmin
       Caption = 'Feiertage (Extra)'
       ImageIndex = 36
       OnShow = tsHoliExtasShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pnlLeftFE: TdxPanel
         AlignWithMargins = True
         Left = 3
@@ -1566,14 +1589,26 @@ object frmAdmin: TfrmAdmin
     object tsReport: TcxTabSheet
       Caption = 'tsReport'
       ImageIndex = 37
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object tsConfig: TcxTabSheet
       Caption = 'Konfiguration'
       ImageIndex = 18
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object cxTabSheet1: TcxTabSheet
       Caption = 'TODO'
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object cxMemo1: TcxMemo
         AlignWithMargins = True
         Left = 3
